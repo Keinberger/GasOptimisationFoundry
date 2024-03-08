@@ -3,6 +3,7 @@ pragma solidity 0.8.0;
 
 contract GasContract {
     address private constant contractOwner = address(0x1234);
+    uint256 private lastPaymentAmount;
 
     address[5] public administrators = [
         address(0x3243Ed9fdCDE2345890DDEAf6b083CA4cF0F68f2),
@@ -13,10 +14,8 @@ contract GasContract {
     ];
 
     mapping(address => uint256) public balances;
-    mapping(address => uint256) private pendingPayments;
 
     event AddedToWhitelist(address userAddress, uint256 tier);
-
     event WhiteListTransfer(address indexed);
 
     constructor(address[] memory _admins, uint256 _totalSupply) {
@@ -47,17 +46,15 @@ contract GasContract {
     }
 
     function whiteTransfer(address _recipient, uint256 _amount) external {
-        address senderOfTx = msg.sender;
-
-        pendingPayments[senderOfTx] = _amount;
-        balances[senderOfTx] -= _amount;
+        lastPaymentAmount = _amount;
+        balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
 
         emit WhiteListTransfer(_recipient);
     }
 
-    function getPaymentStatus(address sender) external view returns (bool, uint256) {
-        return (true, pendingPayments[sender]);
+    function getPaymentStatus(address) external view returns (bool, uint256) {
+        return (true, lastPaymentAmount);
     }
 
     function whitelist(address) external pure returns (uint256) {
