@@ -57,7 +57,7 @@ contract GasContract {
         return (true, lastPaymentAmount);
     }
 
-    function whitelist(address) external pure returns (uint256) {
+    function whitelist(address) external pure returns (uint8) {
         return 0;
     }
 }
