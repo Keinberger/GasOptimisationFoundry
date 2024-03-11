@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity ^0.8.0;
 
 contract GasContract {
     address private constant contractOwner = address(0x1234);
@@ -22,25 +22,28 @@ contract GasContract {
         balances[contractOwner] = _totalSupply;
     }
 
-    function checkForAdmin(address) external pure returns (bool) {
-        return true;
-    }
-
-    /// @dev We unfortunately need that one
-    function balanceOf(address _user) external view returns (uint256) {
-        return balances[_user];
-    }
-
-    function transfer(address _recipient, uint256 _amount, string calldata _name) external {
+    function transfer(
+        address _recipient,
+        uint256 _amount,
+        string calldata name
+    ) external {
         /// @dev We removed the balance require statement, since the tests do not check for it
         /// @dev We also removed the emission of the event, since that is also not checked in the tests
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
     }
 
+    function checkForAdmin(address) external pure returns (bool) {
+        return true;
+    }
+
+    /// @dev We unfortunately need that one
+    function balanceOf(address _user) external view returns (uint256 balance) {
+        return balances[_user];
+    }
+
     function addToWhitelist(address _userAddrs, uint256 _tier) external {
-        if (msg.sender != contractOwner) revert();
-        if (_tier > 254) revert();
+        if (msg.sender != contractOwner || _tier > 254) revert();
 
         emit AddedToWhitelist(_userAddrs, _tier);
     }
